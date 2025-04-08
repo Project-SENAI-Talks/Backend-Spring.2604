@@ -1,4 +1,7 @@
 spring:
+  config:
+    context-path: /jackpot-mirror
+
 
   datasource:
     url: jdbc:h2:mem:testdb
@@ -9,6 +12,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+    show-sql: true
   h2:
     console:
       enabled: true

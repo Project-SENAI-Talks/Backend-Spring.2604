@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EnableJpaRepositories
 @SpringBootApplication
-public class TableApplication {
+public class JackpotApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TableApplication.class, args);
+		SpringApplication.run(JackpotApplication.class, args);
 	}
 
 }

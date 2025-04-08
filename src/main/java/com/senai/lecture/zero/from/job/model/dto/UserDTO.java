@@ -1,5 +1,6 @@
-package com.senai.lecture.zero.from.job.model;
+package com.senai.lecture.zero.from.job.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    private Integer id;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class UserDTO {
     private String name;
     private String email;
     private Integer age;
