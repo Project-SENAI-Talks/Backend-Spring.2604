@@ -5,6 +5,7 @@ import com.senai.lecture.zero.from.job.model.dto.UserDTO;
 import com.senai.lecture.zero.from.job.model.entity.User;
 import com.senai.lecture.zero.from.job.repository.UserRepository;
 import com.senai.lecture.zero.from.job.service.JackpotService;
+import com.senai.lecture.zero.from.job.utils.VerifyNullFieldsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.senai.lecture.zero.from.job.constant.JackpotConstants.ERROR_MESSAGE;
@@ -48,20 +50,21 @@ public class JackpotServiceImpl implements JackpotService {
     public User updateUser(UserDTO userDto, Long id) throws UserNotFoundException {
         log.info("Update user infos from id {}.", id);
 
-        Optional<User> updatedUser = getUserById(id);
-        Optional.ofNullable(updatedUser.get().getName()).ifPresent(userDto::setName);
-        Optional.ofNullable(updatedUser.get().getEmail()).ifPresent(userDto::setEmail);
-        Optional.ofNullable(updatedUser.get().getAge()).ifPresent(userDto::setAge);
-
+        User updatedToBeUser = getUserById(id).orElse(null);
+        VerifyNullFieldsUtils.updateIfPresent(updatedToBeUser::setName, userDto.getName());
+        VerifyNullFieldsUtils.updateIfPresent(updatedToBeUser::setEmail, userDto.getEmail());
+        VerifyNullFieldsUtils.updateIfPresent(updatedToBeUser::setAge, userDto.getAge());
 
         log.info("Update done successfully!");
 
-       return userRepository.save(updatedUser.get());
+        return userRepository.save(Objects.requireNonNull(updatedToBeUser));
     }
 
     @Override
     public void deleteByIdUser(Long id) throws UserNotFoundException{
         log.info("Delete user from id {}.", id);
         Optional.ofNullable(getUserById(id)).ifPresent(user -> userRepository.deleteById(user.get().getId()));
-        log.info("Delete done successfully!");}
+        log.info("Delete done successfully!");
+    }
+
 }
