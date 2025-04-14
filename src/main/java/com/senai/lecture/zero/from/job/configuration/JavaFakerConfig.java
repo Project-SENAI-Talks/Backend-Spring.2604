@@ -20,7 +20,7 @@ public class JavaFakerConfig {
         return args -> {
             Faker faker = new Faker();
 
-            List<User> users = IntStream.range(0, 1000)
+            List<User> users = IntStream.range(0, 10)
                     .mapToObj(i -> {
                         User user = User.builder()
                                 .name(faker.friends().character())
