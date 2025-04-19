@@ -22,12 +22,11 @@ public class JavaFakerConfig {
 
             List<User> users = IntStream.range(0, 10)
                     .mapToObj(i -> {
-                        User user = User.builder()
+                        return User.builder()
                                 .name(faker.friends().character())
                                 .email(faker.internet().emailAddress())
                                 .age(faker.number().numberBetween(1, 110))
                                 .build();
-                        return user;
                     })
                     .toList();
 

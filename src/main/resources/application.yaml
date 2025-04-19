@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   config:
     context-path: /jackpot-mirror
@@ -17,8 +20,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
-server:
-  port: 8080
+openApi:
+  url: http://www.local.jackpot.com.br/jackpot-mirror/api/v1/home
