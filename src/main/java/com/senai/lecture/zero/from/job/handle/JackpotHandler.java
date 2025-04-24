@@ -16,19 +16,18 @@ public class JackpotHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public Error handleException(Exception e) {
-        return createErrorBody(HttpStatus.BAD_REQUEST.value(), e.getMessage(), e.getCause().toString());
+        return createErrorBody(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public Error handleException(UserNotFoundException e) {
-        return createErrorBody(HttpStatus.NOT_FOUND.value(), e.getLocalizedMessage(), e.fillInStackTrace().toString());
+        return createErrorBody(HttpStatus.NOT_FOUND.value(), e.getLocalizedMessage());
     }
 
-    private Error createErrorBody(Integer status, String message, String cause) {
+    private Error createErrorBody(Integer status, String message) {
         return Error.builder()
                 .status(status)
                 .message(message)
-                .cause(cause)
                 .build();
     }
 

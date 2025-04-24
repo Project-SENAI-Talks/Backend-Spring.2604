@@ -15,6 +15,4 @@ public class Error {
     private Integer status;
     @Schema(name = "Message", example = "Not found", defaultValue = "Bad request" )
     private String message;
-    @Schema(name = "cause", example = "User not found", defaultValue = "Invalid Body" )
-    private String cause;
 }

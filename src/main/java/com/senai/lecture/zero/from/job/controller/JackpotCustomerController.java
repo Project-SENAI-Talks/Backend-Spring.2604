@@ -1,10 +1,11 @@
 package com.senai.lecture.zero.from.job.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senai.lecture.zero.from.job.exception.UserNotFoundException;
-import com.senai.lecture.zero.from.job.model.dto.UserDTO;
-import com.senai.lecture.zero.from.job.model.entity.User;
+import com.senai.lecture.zero.from.job.model.dto.CustomerDTO;
 import com.senai.lecture.zero.from.job.model.error.Error;
-import com.senai.lecture.zero.from.job.service.impl.JackpotServiceImpl;
+import com.senai.lecture.zero.from.job.service.JackpotCustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,11 +42,12 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 @Tag(name = "Jackpot", description = "Jackpot's users")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
-public class JackpotController {
+public class JackpotCustomerController {
 
-    private final JackpotServiceImpl tableService;
+    private final ObjectMapper mapper;
+    private final JackpotCustomerService tableService;
 
     @CrossOrigin
     @Operation(summary = "Get all users from Jackpot's system.",
@@ -50,13 +55,17 @@ public class JackpotController {
             description = "It will returns all users from Jackpot's system.",
             responses = {
                     @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = UserDTO.class)), description = "Return all users from Jackpot's system."),
+                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
             })
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping
-    public Page<User> getAllUsers(@PageableDefault(size = 10, sort = "name", direction = ASC) Pageable users) {
+    public Object getAllCustomers(@PageableDefault(size = 5, sort = "name", direction = ASC, page = 0) Pageable pageable,
+                                  @RequestParam(name = "metadata", defaultValue = "false") boolean includeMetadata) throws JsonProcessingException {
+        log.info("GET /customers incoming call with query params: {}", mapper.writeValueAsString(pageable));
+
         log.info("Get all Jackpot's users from Jackpot's system.");
-        return tableService.getAllUsers(users);
+        Page<CustomerDTO> page = tableService.getAllCustomers(pageable);
+        return includeMetadata ? page : page.getContent();
     }
 
     @Operation(summary = "Get user from Jackpot's system.",
@@ -67,13 +76,17 @@ public class JackpotController {
             description = "It will returns an user by Id from Jackpot's system.",
             responses = {
                     @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = UserDTO.class)), description = "It will returns an user by Id from Jackpot's system."),
+                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "It will returns an user by Id from Jackpot's system."),
             })
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping("/{id}")
-    public Optional<User> getUserById(@PathVariable("id") Long id) throws UserNotFoundException {
-        log.info("Get user from id {}.", id);
-        return tableService.getUserById(id);
+    public ResponseEntity<Optional<CustomerDTO>> getCustomerById(@PathVariable("id") Long identityId) throws UserNotFoundException {
+
+        Optional<CustomerDTO> customer = tableService.getCustomerByIdentityId(identityId);
+        if (customer.isEmpty()) {
+            throw new UserNotFoundException(String.format("User with id %s not found.", identityId));
+        }
+        return ResponseEntity.ok(customer);
     }
 
     @Operation(summary = "Get all users from Jackpot's system.",
@@ -81,14 +94,15 @@ public class JackpotController {
             description = "It will returns all users from Jackpot's system.",
             responses = {
                     @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = UserDTO.class)), description = "Return all users from Jackpot's system."),
+                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
             })
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping("/register")
     @Transactional
-    public User registerUser(@RequestBody @Validated UserDTO user) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public CustomerDTO registerCustomer(@RequestBody @Validated CustomerDTO user) {
         log.info("Register new user.");
-        return tableService.registerUser(user);
+        return tableService.registerCustomer(user);
     }
 
     @Operation(summary = "Get all users from Jackpot's system.",
@@ -99,16 +113,17 @@ public class JackpotController {
             description = "It will returns all users from Jackpot's system.",
             responses = {
                     @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = UserDTO.class)), description = "Return all users from Jackpot's system."),
+                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
                     @ApiResponse(responseCode = "404", content =
                     @Content(schema= @Schema(implementation = Error.class)), description = "User not found Jackpot's system."),
             })
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     @PutMapping(("/update/{id}"))
     @Transactional
-    public User updateUser(@RequestBody @Validated UserDTO user, @PathVariable("id") Long id) throws UserNotFoundException {
+    @PreAuthorize("hasRole('ADMIN')")
+    public CustomerDTO updateCustomer(@RequestBody @Validated CustomerDTO user, @PathVariable("id") Long id) throws UserNotFoundException {
         log.info("Update user infos from id {}.", id);
-        return tableService.updateUser(user, id);
+        return tableService.updateCustomer(user, id);
     }
 
     @Operation(summary = "Get all users from Jackpot's system.",
@@ -119,14 +134,15 @@ public class JackpotController {
             description = "It will returns all users from Jackpot's system.",
             responses = {
                     @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = UserDTO.class)), description = "Return all users from Jackpot's system."),
+                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
             })
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     @DeleteMapping("/delete/{id}")
     @Transactional
-    public void deleteByIdUser(@PathVariable("id") Long id) throws UserNotFoundException {
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteCustomerById(@PathVariable("id") Long id) throws UserNotFoundException {
         log.info("Delete user from id {}.", id);
-        tableService.deleteByIdUser(id);
+        tableService.deleteCustomerByIdentityId(id);
     }
 
 }

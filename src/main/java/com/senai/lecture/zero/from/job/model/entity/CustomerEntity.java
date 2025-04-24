@@ -1,6 +1,5 @@
 package com.senai.lecture.zero.from.job.model.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,26 +10,29 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Validated
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "customers")
+public class CustomerEntity {
+
     @Id
-    @Column(name = "id")
+    @Column(name = "customer_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(name = "id", description = "Person id", example = "1")
-    private Long id;
-    @Schema(name = "name", description = "Person name", example = "John Doe")
+    private Long customerId;
+
     @Column(name = "name")
     private String name;
-    @Schema(name = "email", description = "Person email", example = "johndoe@example.com")
+
     @Column(name = "email")
     private String email;
-    @Schema(name = "age", description = "Person age", example = "45", defaultValue = "17" )
+
     @Column(name = "age")
     private Integer age;
+
 }

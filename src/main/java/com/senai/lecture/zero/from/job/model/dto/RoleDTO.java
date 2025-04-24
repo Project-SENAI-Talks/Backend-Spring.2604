@@ -1,16 +1,17 @@
 package com.senai.lecture.zero.from.job.model.dto;
 
+import com.senai.lecture.zero.from.job.model.entity.enumerator.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-    private String username;
-    private String password;
-    private String role;
+public class RoleDTO implements Serializable {
+    private UserRole name;
 }

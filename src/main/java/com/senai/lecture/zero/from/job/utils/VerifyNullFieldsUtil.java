@@ -2,7 +2,7 @@ package com.senai.lecture.zero.from.job.utils;
 
 import java.util.function.Consumer;
 
-public class VerifyNullFieldsUtils {
+public class VerifyNullFieldsUtil {
 
     public static <T> void updateIfPresent(Consumer<T> consumer, T value) {
         if (value != null) {
@@ -10,6 +10,6 @@ public class VerifyNullFieldsUtils {
         }
     }
 
-    private VerifyNullFieldsUtils() {}
+    private VerifyNullFieldsUtil() {}
 
 }
