@@ -52,6 +52,8 @@ public class SecurityConfiguration {
         return http
                 .headers().frameOptions().disable().and()
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors()
+                .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthEntryPoint)
                 .and()
@@ -66,6 +68,7 @@ public class SecurityConfiguration {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/api/v1/user/oauth/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/customers", "/api/v1/customers/{id}").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/customers/register").hasRole(ROLE_ADMIN)
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/customers/update/{id}").hasRole(ROLE_ADMIN)
@@ -81,7 +84,10 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("*"));
+
         configuration.setAllowedMethods(Arrays.asList(PERMITTED_METHODS));
+        configuration.setExposedHeaders(List.of("Access-Control-Allow-Origin"));
+        configuration.setAllowedHeaders(List.of("Access-Control-Allow-Origin"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
