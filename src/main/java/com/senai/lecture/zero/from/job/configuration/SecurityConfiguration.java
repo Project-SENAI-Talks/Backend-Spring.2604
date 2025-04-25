@@ -21,7 +21,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -83,11 +82,38 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
 
-        configuration.setAllowedMethods(Arrays.asList(PERMITTED_METHODS));
-        configuration.setExposedHeaders(List.of("Access-Control-Allow-Origin"));
-        configuration.setAllowedHeaders(List.of("Access-Control-Allow-Origin"));
+        // Allow specific origins
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+
+        // Allow specific methods
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+        // Configure headers
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "X-Requested-With",
+                "Cache-Control",
+                "access-control-allow-origin",
+                "access-control-allow-credentials"
+        ));
+
+        // Configure exposed headers
+        configuration.setExposedHeaders(Arrays.asList(
+                "Content-Type",
+                "Authorization",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Credentials"
+        ));
+
+        // Allow credentials
+        configuration.setAllowCredentials(true);
+
+        // Configure max age
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
