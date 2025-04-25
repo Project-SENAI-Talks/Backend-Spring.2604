@@ -30,7 +30,5 @@ openApi:
 
 logging:
   level:
-    root: DEBUG
     org.springframework: DEBUG
 
-#logging.level.org.springframework.security: DEBUG

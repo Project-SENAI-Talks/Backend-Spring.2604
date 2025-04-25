@@ -76,13 +76,13 @@ public class JackpotCustomerController {
     })
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping
-    public Object getAllCustomers(@PageableDefault(size = 5, sort = "name", direction = ASC) Pageable pageable,
+    public ResponseEntity<Object> getAllCustomers(@PageableDefault(size = 5, sort = "name", direction = ASC) Pageable pageable,
                                   @RequestParam(name = "metadata", defaultValue = "false") boolean includeMetadata) throws JsonProcessingException {
         log.info("GET /customers incoming call with query params: {}", mapper.writeValueAsString(pageable));
 
         log.info("Get all Jackpot's users from Jackpot's system.");
         Page<CustomerDTO> page = tableService.getAllCustomers(pageable);
-        return includeMetadata ? page : page.getContent();
+        return includeMetadata ? ResponseEntity.ok(page) : ResponseEntity.ok(page.getContent());
     }
 
     @Operation(summary = "Get user from Jackpot's system.",
@@ -152,10 +152,10 @@ public class JackpotCustomerController {
     @PostMapping("/register")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public CustomerDTO registerCustomer(@Valid @RequestBody @Validated CustomerDTO user) throws JsonProcessingException {
+    public ResponseEntity<CustomerDTO> registerCustomer(@Valid @RequestBody @Validated CustomerDTO user) throws JsonProcessingException {
         log.info("POST /customers/register incoming call with payload: {}", mapper.writeValueAsString(user));
 
-        return tableService.registerCustomer(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(tableService.registerCustomer(user));
     }
 
     @Operation(summary = "Get all users from Jackpot's system.",
@@ -191,9 +191,9 @@ public class JackpotCustomerController {
     @PutMapping(("/update/{id}"))
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public CustomerDTO updateCustomer(@Valid @RequestBody @Validated CustomerDTO user, @PathVariable("id") Long id) throws UserNotFoundException, JsonProcessingException {
+    public ResponseEntity<CustomerDTO> updateCustomer(@Valid @RequestBody @Validated CustomerDTO user, @PathVariable("id") Long id) throws UserNotFoundException, JsonProcessingException {
         log.info("PUT /customers/update/{id} incoming call with id {} and payload: {}", id, mapper.writeValueAsString(user));
-        return tableService.updateCustomer(user, id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(tableService.updateCustomer(user, id));
     }
 
     @Operation(summary = "Get all users from Jackpot's system.",

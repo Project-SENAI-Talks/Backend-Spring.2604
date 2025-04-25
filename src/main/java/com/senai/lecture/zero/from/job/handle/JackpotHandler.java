@@ -21,6 +21,8 @@ import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 @Order(HIGHEST_PRECEDENCE)
 public class JackpotHandler {
 
+    private static final String ERROR = "ERROR";
+
     @ExceptionHandler({
             BadRequestException.class,
             IllegalArgumentException.class,
@@ -57,7 +59,7 @@ public class JackpotHandler {
 
     private ErrorDTO createErrorBody(HttpStatus status, String message) {
         return ErrorDTO.builder()
-                .result("ERROR")
+                .result(ERROR)
                 .details(ErrorDTO.ErrorProperties.builder()
                         .status(status)
                         .message(message)

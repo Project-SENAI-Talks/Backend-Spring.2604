@@ -78,7 +78,7 @@ public class AuthUserController {
         log.info("POST /register incoming call with body: {}", mapper.writeValueAsString(userData));
 
         if (userRepository.existByUsername(userData.getRole()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User Already Exists.");
         }
         RoleEntity role = roleRepository.findByName(userData.getRole())
                 .orElse(RoleEntity.builder().name("ROLE_" + UserRole.USER.getValue()).build());
@@ -90,7 +90,7 @@ public class AuthUserController {
                 .build();
 
         this.userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.ok("User Registered Successfully.");
     }
 
 
