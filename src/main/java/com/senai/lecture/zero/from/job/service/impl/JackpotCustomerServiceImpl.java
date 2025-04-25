@@ -30,6 +30,8 @@ public class JackpotCustomerServiceImpl implements JackpotCustomerService {
 
     @Override
     public Optional<CustomerDTO> getCustomerByIdentityId(Long identityId) {
+        log.info("Get user from id: {}.", identityId);
+
         Optional<CustomerEntity> customer = jackpotCustomerRepository.findCustomerCustomerId(identityId);
         if (customer.isPresent()) {
             return customer.map(CustomerDTO::convertUserEntityToDTO);
@@ -55,7 +57,11 @@ public class JackpotCustomerServiceImpl implements JackpotCustomerService {
     public CustomerDTO updateCustomer(CustomerDTO customerDto, Long id) throws UserNotFoundException {
         log.info("Update user infos from id {}.", id);
 
-        CustomerEntity updatedToBeCustomerEntity = jackpotCustomerRepository.findCustomerByEmail(customerDto.getEmail()).orElse(null);
+        CustomerEntity updatedToBeCustomerEntity = jackpotCustomerRepository.findCustomerCustomerId(id).orElse(null);
+        if (updatedToBeCustomerEntity == null) {
+            throw new UserNotFoundException(String.format("User with email %s not found.", customerDto.getEmail()));
+        }
+
         VerifyNullFieldsUtil.updateIfPresent(updatedToBeCustomerEntity::setName, customerDto.getName());
         VerifyNullFieldsUtil.updateIfPresent(updatedToBeCustomerEntity::setEmail, customerDto.getEmail());
         VerifyNullFieldsUtil.updateIfPresent(updatedToBeCustomerEntity::setAge, customerDto.getAge());
@@ -70,13 +76,12 @@ public class JackpotCustomerServiceImpl implements JackpotCustomerService {
     public void deleteCustomerByIdentityId(Long identityId) throws UserNotFoundException {
         log.info("Delete user from id: {}.", identityId);
 
-        Optional<CustomerEntity> customerToBeDeleted = Optional.ofNullable(jackpotCustomerRepository.findCustomerCustomerId(identityId)).orElse(null);
+        Optional<CustomerEntity> customerToBeDeleted = jackpotCustomerRepository.findCustomerCustomerId(identityId);
 
         if (customerToBeDeleted.isPresent()) {
-            // Delete the customer
             jackpotCustomerRepository.deleteById(customerToBeDeleted.get().getCustomerId());
         } else {
-            throw new EntityNotFoundException("Customer with identity ID " + identityId + " not found.");
+            throw new EntityNotFoundException(String.format("User with id %s not found.", identityId));
         }
         log.info("Delete done successfully!");
 

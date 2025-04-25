@@ -4,14 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senai.lecture.zero.from.job.exception.UserNotFoundException;
 import com.senai.lecture.zero.from.job.model.dto.CustomerDTO;
-import com.senai.lecture.zero.from.job.model.error.Error;
+import com.senai.lecture.zero.from.job.model.dto.error.ErrorDTO;
 import com.senai.lecture.zero.from.job.service.JackpotCustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -52,14 +54,29 @@ public class JackpotCustomerController {
     @CrossOrigin
     @Operation(summary = "Get all users from Jackpot's system.",
             tags = {"GET"},
-            description = "It will returns all users from Jackpot's system.",
-            responses = {
-                    @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
-            })
+            description = "It will returns all users from Jackpot's system.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDTO.class, example = "Get All Customers.", description = "Get All Customers."))),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))
+    })
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping
-    public Object getAllCustomers(@PageableDefault(size = 5, sort = "name", direction = ASC, page = 0) Pageable pageable,
+    public Object getAllCustomers(@PageableDefault(size = 5, sort = "name", direction = ASC) Pageable pageable,
                                   @RequestParam(name = "metadata", defaultValue = "false") boolean includeMetadata) throws JsonProcessingException {
         log.info("GET /customers incoming call with query params: {}", mapper.writeValueAsString(pageable));
 
@@ -73,14 +90,34 @@ public class JackpotCustomerController {
                     @Parameter(name = "id", description = "User's Id", required = true)
             },
             tags = {"GET"},
-            description = "It will returns an user by Id from Jackpot's system.",
-            responses = {
-                    @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "It will returns an user by Id from Jackpot's system."),
-            })
+            description = "It will returns an user by Id from Jackpot's system.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDTO.class, example = "Get Customer By Id", description = "Get Customer By Id."))),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User Not Found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))
+    })
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping("/{id}")
     public ResponseEntity<Optional<CustomerDTO>> getCustomerById(@PathVariable("id") Long identityId) throws UserNotFoundException {
+        log.info("GET /customers/{id} incoming call with id: {}", identityId);
 
         Optional<CustomerDTO> customer = tableService.getCustomerByIdentityId(identityId);
         if (customer.isEmpty()) {
@@ -91,17 +128,33 @@ public class JackpotCustomerController {
 
     @Operation(summary = "Get all users from Jackpot's system.",
             tags = {"POST"},
-            description = "It will returns all users from Jackpot's system.",
-            responses = {
-                    @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
-            })
+            description = "It will returns all users from Jackpot's system.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "202",
+                    description = "Accepted",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDTO.class, example = "Customer Created Successfully.", description = "Create Customer."))),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))
+    })
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping("/register")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public CustomerDTO registerCustomer(@RequestBody @Validated CustomerDTO user) {
-        log.info("Register new user.");
+    public CustomerDTO registerCustomer(@Valid @RequestBody @Validated CustomerDTO user) throws JsonProcessingException {
+        log.info("POST /customers/register incoming call with payload: {}", mapper.writeValueAsString(user));
+
         return tableService.registerCustomer(user);
     }
 
@@ -110,38 +163,69 @@ public class JackpotCustomerController {
                     @Parameter(name = "id", description = "User's Id", required = true)
             },
             tags = {"PUT"},
-            description = "It will returns all users from Jackpot's system.",
-            responses = {
-                    @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
-                    @ApiResponse(responseCode = "404", content =
-                    @Content(schema= @Schema(implementation = Error.class)), description = "User not found Jackpot's system."),
-            })
+            description = "It will returns all users from Jackpot's system.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "202",
+                    description = "Invalid input",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDTO.class, example = "Customer Updated Successfully.", description = "Update Customer By Id."))),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User Not Found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))
+    })
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     @PutMapping(("/update/{id}"))
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public CustomerDTO updateCustomer(@RequestBody @Validated CustomerDTO user, @PathVariable("id") Long id) throws UserNotFoundException {
-        log.info("Update user infos from id {}.", id);
+    public CustomerDTO updateCustomer(@Valid @RequestBody @Validated CustomerDTO user, @PathVariable("id") Long id) throws UserNotFoundException, JsonProcessingException {
+        log.info("PUT /customers/update/{id} incoming call with id {} and payload: {}", id, mapper.writeValueAsString(user));
         return tableService.updateCustomer(user, id);
     }
 
     @Operation(summary = "Get all users from Jackpot's system.",
-            parameters = {
-                    @Parameter(name = "id", description = "User's Id", required = true)
-            },
+            parameters = { @Parameter(name = "id", description = "User's Id", required = true) },
             tags = {"DELETE"},
-            description = "It will returns all users from Jackpot's system.",
-            responses = {
-                    @ApiResponse(responseCode = "200", content =
-                    @Content(schema= @Schema(implementation = CustomerDTO.class)), description = "Return all users from Jackpot's system."),
+            description = "It will returns all users from Jackpot's system."
+            )
+            @ApiResponses(value = {
+                    @ApiResponse(
+                            responseCode = "202",
+                            description = "Accepted",
+                            content = @Content(mediaType = "text/plain",
+                                    schema = @Schema(implementation = String.class, example = "Customer Deleted Successfully.", description = "Delete Customer By Id."))),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "User Not Found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))
             })
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     @DeleteMapping("/delete/{id}")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCustomerById(@PathVariable("id") Long id) throws UserNotFoundException {
-        log.info("Delete user from id {}.", id);
+        log.info("DELETE /customers/delete/{id} incoming call with id: {}", id);
         tableService.deleteCustomerByIdentityId(id);
     }
 

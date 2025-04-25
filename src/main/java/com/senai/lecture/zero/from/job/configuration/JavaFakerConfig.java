@@ -47,11 +47,11 @@ public class JavaFakerConfig {
         return args -> {
             RoleEntity adminRole = RoleEntity.builder()
                     .roleId(1L)
-                    .name("ROLE_" + UserRole.ADMIN.getRoleName())
+                    .name("ROLE_" + UserRole.ADMIN.getValue())
                     .build();
             RoleEntity userRole = RoleEntity.builder()
                     .roleId(2L)
-                    .name("ROLE_" + UserRole.USER.getRoleName())
+                    .name("ROLE_" + UserRole.USER.getValue())
                     .build();
 
             roleRepository.save(adminRole);

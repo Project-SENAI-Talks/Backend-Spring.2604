@@ -2,8 +2,6 @@ package com.senai.lecture.zero.from.job.configuration;
 
 import com.senai.lecture.zero.from.job.configuration.jwt.JwtAuthEntryPoint;
 import com.senai.lecture.zero.from.job.configuration.jwt.JwtAuthenticationFilter;
-import com.senai.lecture.zero.from.job.model.entity.enumerator.UserRole;
-import com.senai.lecture.zero.from.job.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,14 +21,21 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String[] PERMITTED_METHODS = {
+            HttpMethod.GET.name(),
+            HttpMethod.POST.name(),
+            HttpMethod.PUT.name(),
+            HttpMethod.DELETE.name()
+    };
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
-    private final CustomUserDetailsService userDetailsService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -59,11 +64,12 @@ public class SecurityConfiguration {
                                 .requestMatchers(
                                         "/h2-console/**",
                                         "/swagger-ui/**",
+                                        "/v3/api-docs/**",
                                         "/api/v1/user/oauth/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/customers", "/api/v1/customers/{id}").authenticated()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/customers/register").hasRole(UserRole.ADMIN.getRoleName())
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/customers/update/{id}").hasRole(UserRole.ADMIN.getRoleName())
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/delete/{id}").hasRole(UserRole.ADMIN.getRoleName())
+                                .requestMatchers(HttpMethod.POST, "/api/v1/customers/register").hasRole(ROLE_ADMIN)
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/customers/update/{id}").hasRole(ROLE_ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/delete/{id}").hasRole(ROLE_ADMIN)
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -74,8 +80,8 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList(PERMITTED_METHODS));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

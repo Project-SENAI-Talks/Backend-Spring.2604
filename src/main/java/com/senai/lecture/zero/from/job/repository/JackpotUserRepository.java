@@ -17,6 +17,6 @@ public interface JackpotUserRepository extends JpaRepository<UserEntity, Long> {
     @Query("SELECT user FROM UserEntity user WHERE user.username = :username")
     Optional<UserEntity> existByUsername(@Param("username") String username);
 
-    // TODO: Vulnerable SQL injection query
+    // Vulnerable SQL injection query
     // SELECT * FROM user_data WHERE username = '"' AND password = ''"
 }
