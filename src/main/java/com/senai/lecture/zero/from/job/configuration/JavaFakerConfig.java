@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.stream.IntStream;
 
+
 @Configuration
 @RequiredArgsConstructor
 public class JavaFakerConfig {
@@ -69,6 +70,7 @@ public class JavaFakerConfig {
                         return UserEntity.builder()
                                 .username("admin123")
                                 .password(encoder.encode("1234567890123"))
+                                .roles(List.of(RoleEntity.builder().name(UserRole.ADMIN.getValue()).build()))
                                 .build();
                     })
                     .toList();
