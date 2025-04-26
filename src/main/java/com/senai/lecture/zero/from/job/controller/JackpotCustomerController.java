@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senai.lecture.zero.from.job.exception.UserNotFoundException;
 import com.senai.lecture.zero.from.job.model.dto.CustomerDTO;
 import com.senai.lecture.zero.from.job.model.dto.error.ErrorDTO;
-import com.senai.lecture.zero.from.job.service.JackpotCustomerService;
+import com.senai.lecture.zero.from.job.service.impl.JackpotCustomerServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,7 +49,7 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 public class JackpotCustomerController {
 
     private final ObjectMapper mapper;
-    private final JackpotCustomerService tableService;
+    private final JackpotCustomerServiceImpl tableService;
 
     @CrossOrigin
     @Operation(summary = "Get all users from Jackpot's system.",
