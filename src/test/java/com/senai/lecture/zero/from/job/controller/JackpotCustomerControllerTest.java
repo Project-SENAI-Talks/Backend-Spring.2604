@@ -124,11 +124,16 @@ class JackpotCustomerControllerTest {
     }
 
     @Test
-    void testDeleteCustomerByIdWhenUserExistsThenReturnsStatusOk() {
+    void testDeleteCustomerByIdWhenUserExistsThenReturnsStatusAccepted() {
+        // given
+        final String expectedResponse = "Customer Deleted Successfully.";
+
         // When
-        jackpotCustomerService.deleteCustomerByIdentityId(ID_TEST);
+        ResponseEntity<String> response = controller.deleteCustomerById(ID_TEST);
 
         // Then
+        assertEquals(expectedResponse, response.getBody());
+        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
         verify(jackpotCustomerService).deleteCustomerByIdentityId(ID_TEST);
     }
 

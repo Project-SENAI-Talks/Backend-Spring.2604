@@ -224,9 +224,10 @@ public class JackpotCustomerController {
     @DeleteMapping("/delete/{id}")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteCustomerById(@PathVariable("id") Long id) throws UserNotFoundException {
+    public ResponseEntity<String> deleteCustomerById(@PathVariable("id") Long id) throws UserNotFoundException {
         log.info("DELETE /customers/delete/{id} incoming call with id: {}", id);
         tableService.deleteCustomerByIdentityId(id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Customer Deleted Successfully.");
     }
 
 }
