@@ -2,6 +2,7 @@ package com.senai.lecture.zero.from.job.handle;
 
 import com.senai.lecture.zero.from.job.exception.UserNotFoundException;
 import com.senai.lecture.zero.from.job.model.dto.error.ErrorDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,12 @@ public class JackpotHandler {
     public ResponseEntity<ErrorDTO> handleException(AuthenticationException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(createErrorBody(HttpStatus.UNAUTHORIZED, e.getMessage()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleException(EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(createErrorBody(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(UserNotFoundException.class)

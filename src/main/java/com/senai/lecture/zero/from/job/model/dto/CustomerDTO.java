@@ -19,6 +19,9 @@ import org.springframework.validation.annotation.Validated;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(name = "Customer", description = "Customer information", required = true)
 public class CustomerDTO {
+
+    @Schema(name = "customerId", description = "Customer id", example = "1")
+    private Long customerId;
     @Schema(name = "name", description = "Person name", example = "John Doe")
     @NotEmpty(message = "Name is required")
     private String name;
@@ -33,6 +36,7 @@ public class CustomerDTO {
 
     public static CustomerDTO convertUserEntityToDTO(CustomerEntity customerEntity) {
         return CustomerDTO.builder()
+                .customerId(customerEntity.getCustomerId())
                 .name(customerEntity.getName())
                 .email(customerEntity.getEmail())
                 .age(customerEntity.getAge())
