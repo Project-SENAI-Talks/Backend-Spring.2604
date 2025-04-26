@@ -67,8 +67,8 @@ public class JavaFakerConfig {
             List<UserEntity> adminUserEntities = IntStream.range(0, 2)
                     .mapToObj(i -> {
                         return UserEntity.builder()
-                                .username(faker.name().username())
-                                .password(encoder.encode(faker.internet().password()))
+                                .username("admin123")
+                                .password(encoder.encode("1234567890123"))
                                 .build();
                     })
                     .toList();
@@ -76,8 +76,8 @@ public class JavaFakerConfig {
             List<UserEntity> userEntities = IntStream.range(0, 0)
                     .mapToObj(i -> {
                         return UserEntity.builder()
-                                .username(faker.name().username())
-                                .password(faker.internet().password())
+                                .username("user123")
+                                .password(encoder.encode("1234567890123"))
                                 .build();
                     })
                     .toList();
