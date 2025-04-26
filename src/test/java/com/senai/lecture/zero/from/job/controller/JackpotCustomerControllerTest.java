@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senai.lecture.zero.from.job.exception.UserNotFoundException;
 import com.senai.lecture.zero.from.job.model.dto.CustomerDTO;
-import com.senai.lecture.zero.from.job.service.JackpotCustomerService;
+import com.senai.lecture.zero.from.job.service.impl.JackpotCustomerServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +41,7 @@ class JackpotCustomerControllerTest {
 
 
     @Mock
-    private JackpotCustomerService jackpotCustomerService;
+    private JackpotCustomerServiceImpl jackpotCustomerService;
 
     @InjectMocks
     private JackpotCustomerController controller;
