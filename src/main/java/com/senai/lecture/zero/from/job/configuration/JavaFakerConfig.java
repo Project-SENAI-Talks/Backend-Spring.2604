@@ -68,7 +68,7 @@ public class JavaFakerConfig {
                     .mapToObj(i -> {
                         return UserEntity.builder()
                                 .username(faker.name().username())
-                                .password(faker.internet().password())
+                                .password(encoder.encode(faker.internet().password()))
                                 .build();
                     })
                     .toList();
