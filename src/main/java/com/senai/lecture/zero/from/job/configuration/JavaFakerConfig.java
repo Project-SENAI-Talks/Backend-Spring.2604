@@ -28,7 +28,7 @@ public class JavaFakerConfig {
         return args -> {
             Faker faker = new Faker();
 
-            List<CustomerEntity> customerEntities = IntStream.range(0, 1000)
+            List<CustomerEntity> customerEntities = IntStream.range(0, 50)
                     .mapToObj(i -> {
                         return CustomerEntity.builder()
                                 .name(faker.friends().character())
