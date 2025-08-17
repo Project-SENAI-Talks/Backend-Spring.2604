@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    context-path: /jackpot-mirror
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  # Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  # H2 Database Configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+openApi:
+  url: http://www.local.jackpot.com.br/jackpot-mirror/api/v1/home
+
+logging:
+  level:
+    org.springframework: DEBUG
+
